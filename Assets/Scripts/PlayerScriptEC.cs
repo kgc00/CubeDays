@@ -77,11 +77,11 @@ public class PlayerScriptEC : MonoBehaviour
             dialogueTimer = dialogueTimer + Time.deltaTime;
             if (dialogueTimer > dialogueWaitTime){
                 if (pickUpOrNpc) {
-                    SetDialogueValue(false);
+                    //SetDialogueValue(false);
                     pickUpOrNpc = false;
                 } else if (dialogueType == "tutorial") {
                     if (tutorialScript.ReturnCurrentTutorialIndex() > 2) {
-                        SetDialogueValue(false);
+                        //SetDialogueValue(false);
                     }
                 }
             }
@@ -90,7 +90,7 @@ public class PlayerScriptEC : MonoBehaviour
         if (!npcTextComponent.enabled) 
         {
             if (dialogueTimer >= dialogueWaitTime && inDialogue){
-                SetDialogueValue(false);
+                //SetDialogueValue(false);
             }
         } else {
             return;
@@ -116,102 +116,26 @@ public class PlayerScriptEC : MonoBehaviour
         }
     }
 
-    public void PS_StartDialogue(){
-        playCont.canMove = false;
-        inDialogue = true;
-        npcTextComponent.enabled = true; 
-        EnableTextComponent(dialogueType);
-        if (dialogueType != "tutorial") {
-            pickUpOrNpc = true;
-        }
-    }
-
-    public void PS_EndDialogue()
+        public void Interact(float waitTime, string text)
     {
-        StartCoroutine(EnableMovementCoroutine());
-        // playCont.canMove = true;
-        inDialogue = false;
-        npcTextComponent.enabled = false;
-        pickUpOrNpc = false;
-        if (dialogueType == "tutorial") {
-            // do gamestart things
-            tutorialScript.ResetValues(); 
-        }
+        dialogueWaitTime = waitTime;
+        npcDialogueText = text;
+        //EnableTextComponent("npc");
     }
-    
-    public void SetDialogueValue(bool value)
+
+        public void Pickup()
     {
-        if (dialogueType != null){
-            inDialogue = value;
-            if (inDialogue) {
-                PS_StartDialogue();
-            } else if (!inDialogue) {
-                PS_EndDialogue();
-            }
-        } else {
-            Debug.LogError("no dialogue type specified");
-        }
+        //EnableTextComponent("pickup");
     }
 
-    public void SetDialogueValue(bool value, string source)
+    public void noKeyCantLeave()
     {
-        inDialogue = value;
-        dialogueType = source;
-
-        if (inDialogue) {
-            PS_StartDialogue();
-        } else if (!inDialogue) {
-            PS_EndDialogue();
-        }
+        //EnableTextComponent("goal");
     }
 
-        public void SetDialogueValue(bool value, string source, bool end)
-    {
-        inDialogue = value;
-        dialogueType = source;
-        if (end){
-            if (inDialogue) {
-                PS_StartDialogue();
-            } else if (!inDialogue) {
-                PS_EndDialogue();
-            }
-        }
-    }
-
-    private void EnableTextComponent(string type)
-    {        
-        npcTextComponent.transform.parent.position = Camera.main.WorldToScreenPoint(transform.position);
-        npcTextComponent.enabled = true;
-        dialogueTimer = 0f;
-        if (type == "pickup"){              
-            SetDialogueValue(true, "pickup", false);
-            npcTextComponent.color = Color.green;
-            npcTextComponent.text = pickupText;  
-            dialogueWaitTime = 3f;               
-            pickUpOrNpc = true;    
-        } else if (type == "npc") {
-            SetDialogueValue(true, "npc", false);            
-            npcTextComponent.text = npcDialogueText;
-            npcTextComponent.color = Color.blue;
-            pickUpOrNpc = true;
-        } else if (type == "goal") {            
-            SetDialogueValue(true, "goal");
-            npcTextComponent.text = goalCantLeave;
-            npcTextComponent.color = goalText.color;
-            // replace with a variable
-            dialogueWaitTime = 3f;
-        } else if (type == "tutorial"){
-            npcTextComponent.color = Color.blue;
-            npcTextComponent.text = tutorialScript.ReturnCurrentTutorial();
-            dialogueWaitTime = tutorialScript.ReturnWaitTime();
-        } else {
-            Debug.LogError("no type specified");
-        }
-    }
-
+// Timer for Cant Reach
     private void DisplayErrorLogic()
-    {
-        //Timer for Cant Reach
+    {        
         if (click.enabled)
         {
             timer = timer + Time.deltaTime;
@@ -249,23 +173,6 @@ public class PlayerScriptEC : MonoBehaviour
     {
         health--;
         GameObject hurt = Instantiate(hurtfx, transform.position, transform.rotation);
-    }
-
-    public void Interact(float waitTime, string text)
-    {
-        dialogueWaitTime = waitTime;
-        npcDialogueText = text;
-        EnableTextComponent("npc");
-    }
-
-    public void Pickup()
-    {
-        EnableTextComponent("pickup");
-    }
-
-    public void noKeyCantLeave()
-    {
-        EnableTextComponent("goal");
     }
 
     public void CantReach()

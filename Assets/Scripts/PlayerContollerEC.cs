@@ -48,7 +48,7 @@ public class PlayerContollerEC : MonoBehaviour {
         if (ps.inDialogue)
         {
             if (Input.GetMouseButtonDown(0)){
-                ps.SetDialogueValue(false);
+                //ps.SetDialogueValue(false);
                 return;
             }
         }

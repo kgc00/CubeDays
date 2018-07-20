@@ -47,14 +47,14 @@ public class GameStart : MonoBehaviour {
 		} else {
 			timerOn = false;
 			displayText.enabled = false;
-			ps.SetDialogueValue(false, "tutorial", false);
+			//ps.SetDialogueValue(false, "tutorial", false);
 			ps.TutorialHack();
 		}
 	}
 
 	public void Tutorial (){
 		if (currentTextIndex <= tutTextArray.Length) {
-			ps.SetDialogueValue(true, "tutorial");
+			//ps.SetDialogueValue(true, "tutorial");
 			timerOn = true;
 		}
 	}
