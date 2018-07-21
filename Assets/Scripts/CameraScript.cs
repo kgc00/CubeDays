@@ -11,15 +11,9 @@ public class CameraScript : MonoBehaviour
     public int camNum = 1;
 	[SerializeField]
 	GameStart gs;
-	public bool tutorialLevel = false;
 
     void Start()
     {
-		if (tutorialLevel) {
-			if (FindObjectOfType<GameStart> ().isActiveAndEnabled) {
-				gs = FindObjectOfType<GameStart> ();
-			}
-		}
     }
 
     void Update()

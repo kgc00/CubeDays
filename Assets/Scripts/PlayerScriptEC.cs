@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,17 +34,19 @@ public class PlayerScriptEC : MonoBehaviour
     public string npcDialogueText;
     EndCubeScript endCube;
     PlayerContollerEC playCont;
-    public bool inDialogue {get; private set; }
+    public bool inDialogue { get; private set; }
     bool pickUpOrNpc;
     GameStart tutorialScript;
     string dialogueType;
+    ePlayerState playerState;
 
     // Use this for initialization  
     void Start()
     {
         pickUpOrNpc = false;
         lives = 3;
-        if (FindObjectOfType<GameStart>()){
+        if (FindObjectOfType<GameStart>())
+        {
             tutorialScript = FindObjectOfType<GameStart>();
         }
         endCube = FindObjectOfType<EndCubeScript>();
@@ -52,7 +55,19 @@ public class PlayerScriptEC : MonoBehaviour
         deadIMG.enabled = false;
         click.enabled = false;
         goalText.enabled = false;
-        inDialogue = false;
+        playerState = ePlayerState.idle;
+
+        DialogueManager.instance.dialogueEvent += SetPlayerInDialogue;
+    }
+
+    public void SetPlayerInDialogue(sDialogueStruct sDialogueData)
+    {
+        playerState = ePlayerState.inDialogue;
+    }
+
+    public void PassPlayerState()
+    {
+
     }
 
     // Update is called once per frame
@@ -75,55 +90,71 @@ public class PlayerScriptEC : MonoBehaviour
         if (npcTextComponent.enabled)
         {
             dialogueTimer = dialogueTimer + Time.deltaTime;
-            if (dialogueTimer > dialogueWaitTime){
-                if (pickUpOrNpc) {
+            if (dialogueTimer > dialogueWaitTime)
+            {
+                if (pickUpOrNpc)
+                {
                     //SetDialogueValue(false);
                     pickUpOrNpc = false;
-                } else if (dialogueType == "tutorial") {
-                    if (tutorialScript.ReturnCurrentTutorialIndex() > 2) {
+                }
+                else if (dialogueType == "tutorial")
+                {
+                    if (tutorialScript.ReturnCurrentTutorialIndex() > 2)
+                    {
                         //SetDialogueValue(false);
                     }
                 }
             }
         }
 
-        if (!npcTextComponent.enabled) 
+        if (!npcTextComponent.enabled)
         {
-            if (dialogueTimer >= dialogueWaitTime && inDialogue){
+            if (dialogueTimer >= dialogueWaitTime && inDialogue)
+            {
                 //SetDialogueValue(false);
             }
-        } else {
+        }
+        else
+        {
             return;
         }
     }
 
-    public void TutorialHack(){
+    public void TutorialHack()
+    {
         StartCoroutine(EnableMovementCoroutine());
     }
 
-    IEnumerator EnableMovementCoroutine(){
+    IEnumerator EnableMovementCoroutine()
+    {
         float crWaitTime = .25f;
-        if (dialogueType == "tutorial") {
-            if (tutorialScript.ReturnCurrentTutorialIndex() < 2) {
+        if (dialogueType == "tutorial")
+        {
+            if (tutorialScript.ReturnCurrentTutorialIndex() < 2)
+            {
                 yield break;
-            } else if (tutorialScript.ReturnCurrentTutorialIndex() >= 2) {
-                yield return new WaitForSeconds(crWaitTime);        
+            }
+            else if (tutorialScript.ReturnCurrentTutorialIndex() >= 2)
+            {
+                yield return new WaitForSeconds(crWaitTime);
                 playCont.canMove = true;
             }
-        } else{
-            yield return new WaitForSeconds(crWaitTime);        
+        }
+        else
+        {
+            yield return new WaitForSeconds(crWaitTime);
             playCont.canMove = true;
         }
     }
 
-        public void Interact(float waitTime, string text)
+    public void Interact(float waitTime, string text)
     {
         dialogueWaitTime = waitTime;
         npcDialogueText = text;
         //EnableTextComponent("npc");
     }
 
-        public void Pickup()
+    public void Pickup()
     {
         //EnableTextComponent("pickup");
     }
@@ -133,9 +164,9 @@ public class PlayerScriptEC : MonoBehaviour
         //EnableTextComponent("goal");
     }
 
-// Timer for Cant Reach
+    // Timer for Cant Reach
     private void DisplayErrorLogic()
-    {        
+    {
         if (click.enabled)
         {
             timer = timer + Time.deltaTime;
@@ -191,6 +222,6 @@ public class PlayerScriptEC : MonoBehaviour
 
     public void End()
     {
-        endIMG.enabled = true;        
+        endIMG.enabled = true;
     }
 }
