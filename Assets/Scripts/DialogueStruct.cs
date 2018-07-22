@@ -11,8 +11,7 @@ public struct sDialogueStruct
 {
     public eDialogueType eCurrentDialogueType;
     public float fDialogueWaitTime;
-    public string tTextToDisplay;
     public Text tTextComponent;
-    public Color textColor;
-
+    public Color tTextColor;
+    public string[] tTextToDisplay;
 }

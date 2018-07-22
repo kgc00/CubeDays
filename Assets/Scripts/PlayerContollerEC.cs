@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +7,6 @@ public class PlayerContollerEC : MonoBehaviour
 {
 
     CharacterController cc;
-    PlayerScriptEC ps;
 
     public int score = 0;
     float moveSpeed = 5f;
@@ -34,7 +34,7 @@ public class PlayerContollerEC : MonoBehaviour
         }
         moveClick = false;
         cc = gameObject.GetComponent<CharacterController>();
-        ps = gameObject.GetComponent<PlayerScriptEC>();
+        PlayerScriptEC.instance = gameObject.GetComponent<PlayerScriptEC>();
     }
 
 
@@ -42,17 +42,28 @@ public class PlayerContollerEC : MonoBehaviour
     void Update()
     {
         DeathLogic();
-        DialogueLogic();
-        MovementLogic();
+        DetermineLogic();
+    }
+
+    private void DetermineLogic()
+    {
+        if (CheckPlayerInDialogue())
+        {
+            DialogueLogic();
+        }
+        else
+        {
+            MovementLogic();
+        }
     }
 
     private void DialogueLogic()
     {
-        if (ps.inDialogue)
+        if (CheckPlayerInDialogue())
         {
             if (Input.GetMouseButtonDown(0))
             {
-                //ps.SetDialogueValue(false);
+                DialogueManager.instance.TryEndDialogue();
                 return;
             }
         }
@@ -65,11 +76,8 @@ public class PlayerContollerEC : MonoBehaviour
 
     private void MovementLogic()
     {
-        if (!CheckPlayerInDialogue())
-        {
-            RayCastLogic();
-            DestinationLogic();
-        }
+        RayCastLogic();
+        DestinationLogic();
     }
 
     private void RayCastLogic()
@@ -85,7 +93,7 @@ public class PlayerContollerEC : MonoBehaviour
             if (hit.point.y - transform.position.y > .6f || hit.point.y - transform.position.y < -2f)
             {
                 //Debug.Log("Click");
-                ps.CantReach();
+                PlayerScriptEC.instance.CantReach();
             }
             else if (hitSomething)
             {
@@ -100,7 +108,7 @@ public class PlayerContollerEC : MonoBehaviour
             }
             else if (hitSomethingNF)
             {
-                ps.NotFloor();
+                PlayerScriptEC.instance.NotFloor();
             }
         }
     }
@@ -126,7 +134,7 @@ public class PlayerContollerEC : MonoBehaviour
 
     private void DeathLogic()
     {
-        if (ps.isDead)
+        if (PlayerScriptEC.instance.isDead)
         {
             canMove = false;
         }

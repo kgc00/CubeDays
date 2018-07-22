@@ -73,11 +73,13 @@ public class PlayerScriptEC : MonoBehaviour
 
     private void SetPlayerInDialogue(sDialogueStruct sDialogueData)
     {
+        DialogueManager.instance.initiateDialogueEvent -= SetPlayerInDialogue;
         playerState = ePlayerState.inDialogue;
     }
 
     private void SetPlayerOutOfDialogue()
     {
+        DialogueManager.instance.endDialogueEvent -= SetPlayerOutOfDialogue;
         playerState = ePlayerState.idle;
     }
 

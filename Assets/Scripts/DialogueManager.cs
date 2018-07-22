@@ -9,7 +9,14 @@ public class DialogueManager : MonoBehaviour
 {
 
     public event Action<sDialogueStruct> initiateDialogueEvent = delegate { };
+    public event Action<sDialogueStruct> continueDialogueEvent = delegate { };
     public event Action endDialogueEvent = delegate { };
+    public int currentLineOfDialogue;
+    // {
+    //     get { return currentLineOfDialogue; }
+    //     private set {  }
+
+    // }
 
     public static DialogueManager instance;
 
@@ -25,6 +32,7 @@ public class DialogueManager : MonoBehaviour
         }
 
         initiateDialogueEvent = DM_StartDialogue;
+        continueDialogueEvent = DM_ContinueDialogue;
         endDialogueEvent = DM_EndDialogue;
     }
 
@@ -44,7 +52,7 @@ public class DialogueManager : MonoBehaviour
 
     private void DialogueLogic()
     {
-        
+
     }
 
     public void TryStartDialogue(sDialogueStruct sDialogueData)
@@ -52,7 +60,9 @@ public class DialogueManager : MonoBehaviour
         if (initiateDialogueEvent != null)
         {
             initiateDialogueEvent(sDialogueData);
-        } else {
+        }
+        else
+        {
             Debug.Log("couldnt start dialogue");
         }
     }
@@ -69,20 +79,30 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void DM_StartDialogue(sDialogueStruct sDialogueData)
+    private void DM_StartDialogue(sDialogueStruct sDialogueData)
     {
-        // enable text
-        // start timer (set state for player)
-        StartCoroutine(SetDialogueLength(sDialogueData.fDialogueWaitTime));
-        // disable movement
+        currentLineOfDialogue = 0;
+        StartCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));
     }
 
-    private IEnumerator SetDialogueLength(float dialogueLength)
+    private void DM_ContinueDialogue(sDialogueStruct sDialogueData)
     {
-        yield return new WaitForSeconds(dialogueLength);
-        if (CheckContinueDialouge())
-        {
+        IncreaseDialogueLine();
+        StartCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));
+    }
 
+    private IEnumerator ContinueDialogueAfterWait(sDialogueStruct sDialogueData, Action<sDialogueStruct, int> onComplete)
+    {
+        yield return new WaitForSeconds(sDialogueData.fDialogueWaitTime);
+        onComplete(sDialogueData, currentLineOfDialogue);
+        yield return null;
+    }
+
+    private void CheckContinueDialouge(sDialogueStruct dialogueData, int currentLine)
+    {
+        if (dialogueData.tTextToDisplay.Length < currentLine)
+        {
+            continueDialogueEvent(dialogueData);
         }
         else
         {
@@ -90,14 +110,12 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    private bool CheckContinueDialouge()
+    private void IncreaseDialogueLine()
     {
-        // have to implement
-        return false;
-        //PlayerScriptEC.instance.playerState == ePlayerState.inDialogue;
+        currentLineOfDialogue += 1;
     }
 
-    public void DM_EndDialogue()
+    private void DM_EndDialogue()
     {
         // reset timer (and player state)
         // enable moevemnt
