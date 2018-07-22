@@ -5,75 +5,106 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(PlayerScriptEC))]
-public class DialogueManager : MonoBehaviour {
+public class DialogueManager : MonoBehaviour
+{
 
-    public event Action<sDialogueStruct> dialogueEvent = delegate { };
+    public event Action<sDialogueStruct> initiateDialogueEvent = delegate { };
+    public event Action endDialogueEvent = delegate { };
 
     public static DialogueManager instance;
-    
-	void Awake () {
-        if (instance == null){
+
+    void Awake()
+    {
+        if (instance == null)
+        {
             instance = this;
-        } else if (instance != this) {
+        }
+        else if (instance != this)
+        {
             Destroy(this);
         }
 
-        dialogueEvent = DM_StartDialogue;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		if (true) {
-			DialogueLogic ();
-		}
-	}
+        initiateDialogueEvent = DM_StartDialogue;
+        endDialogueEvent = DM_EndDialogue;
+    }
+
+
+    void Update()
+    {
+        if (CheckPlayerInDialogue())
+        {
+            DialogueLogic();
+        }
+    }
+
+    private bool CheckPlayerInDialogue()
+    {
+        return PlayerScriptEC.instance.playerState == ePlayerState.inDialogue;
+    }
 
     private void DialogueLogic()
     {
-        // if (dialogueTimer > cDialogueClass.fDialogueWaitTime){
-        //     dialogueTimer += Time.deltaTime;
-        // } else
-        // {
-        //     if(CheckContinueDialouge()){
-        //         // DM_StartDialogue();
-        //     } else {
-        //         // DM_EndDialogue();
-        //     }
-        // }
+        
     }
 
-    public void ReceiveDialogue(sDialogueStruct sDialogueData){        
-        if (dialogueEvent != null) {
-            dialogueEvent(sDialogueData);
+    public void TryStartDialogue(sDialogueStruct sDialogueData)
+    {
+        if (initiateDialogueEvent != null)
+        {
+            initiateDialogueEvent(sDialogueData);
+        } else {
+            Debug.Log("couldnt start dialogue");
         }
+    }
 
-        DM_StartDialogue(sDialogueData);
+    public void TryEndDialogue()
+    {
+        if (endDialogueEvent != null)
+        {
+            endDialogueEvent();
+        }
+        else
+        {
+            Debug.LogError("No end dialogue event");
+        }
     }
 
     public void DM_StartDialogue(sDialogueStruct sDialogueData)
     {
-        // npcTextComponent.enabled = true; 
-        // EnableTextComponent(inputType);
-        // if (inputType != eDialogueType.tutorial) {
-        //     pickUpOrNpc = true;
-        // }
+        // enable text
+        // start timer (set state for player)
+        StartCoroutine(SetDialogueLength(sDialogueData.fDialogueWaitTime));
+        // disable movement
     }
 
-    public void DM_EndDialogue(eDialogueType inputType)
+    private IEnumerator SetDialogueLength(float dialogueLength)
     {
-        //StartCoroutine(EnableMovementCoroutine());
-        // playCont.canMove = true;
-        // inDialogue = false;
-        // npcTextComponent.enabled = false;
-        // pickUpOrNpc = false;
-        // if (dialogueType == "tutorial") {
-        //     // do gamestart things
-        //     tutorialScript.ResetValues(); 
-        // }
+        yield return new WaitForSeconds(dialogueLength);
+        if (CheckContinueDialouge())
+        {
+
+        }
+        else
+        {
+            TryEndDialogue();
+        }
+    }
+
+    private bool CheckContinueDialouge()
+    {
+        // have to implement
+        return false;
+        //PlayerScriptEC.instance.playerState == ePlayerState.inDialogue;
+    }
+
+    public void DM_EndDialogue()
+    {
+        // reset timer (and player state)
+        // enable moevemnt
     }
 
     private void EnableTextComponent(eDialogueType inputType)
-    {        
+    {
         // npcTextComponent.transform.parent.position = Camera.main.WorldToScreenPoint(transform.position);
         // npcTextComponent.enabled = true;
         // dialogueTimer = 0f;

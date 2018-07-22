@@ -38,11 +38,21 @@ public class PlayerScriptEC : MonoBehaviour
     bool pickUpOrNpc;
     GameStart tutorialScript;
     string dialogueType;
-    ePlayerState playerState;
+    public ePlayerState playerState;
+    public static PlayerScriptEC instance;
 
     // Use this for initialization  
     void Start()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(this);
+        }
+
         pickUpOrNpc = false;
         lives = 3;
         if (FindObjectOfType<GameStart>())
@@ -57,12 +67,18 @@ public class PlayerScriptEC : MonoBehaviour
         goalText.enabled = false;
         playerState = ePlayerState.idle;
 
-        DialogueManager.instance.dialogueEvent += SetPlayerInDialogue;
+        DialogueManager.instance.initiateDialogueEvent += SetPlayerInDialogue;
+        DialogueManager.instance.endDialogueEvent += SetPlayerOutOfDialogue;
     }
 
-    public void SetPlayerInDialogue(sDialogueStruct sDialogueData)
+    private void SetPlayerInDialogue(sDialogueStruct sDialogueData)
     {
         playerState = ePlayerState.inDialogue;
+    }
+
+    private void SetPlayerOutOfDialogue()
+    {
+        playerState = ePlayerState.idle;
     }
 
     public void PassPlayerState()
@@ -137,13 +153,13 @@ public class PlayerScriptEC : MonoBehaviour
             else if (tutorialScript.ReturnCurrentTutorialIndex() >= 2)
             {
                 yield return new WaitForSeconds(crWaitTime);
-                playCont.canMove = true;
+                // playCont.canMove = true;
             }
         }
         else
         {
             yield return new WaitForSeconds(crWaitTime);
-            playCont.canMove = true;
+            // playCont.canMove = true;
         }
     }
 

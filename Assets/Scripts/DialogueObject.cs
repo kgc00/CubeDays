@@ -8,6 +8,6 @@ public class DialogueObject : MonoBehaviour {
 	protected sDialogueStruct sDialogueData;
 
 	protected void InitiateDialogue(sDialogueStruct sDialogueData){
-		DialogueManager.instance.ReceiveDialogue(sDialogueData);
+		DialogueManager.instance.TryStartDialogue(sDialogueData);
 	}
 }

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerContollerEC : MonoBehaviour {
+public class PlayerContollerEC : MonoBehaviour
+{
 
-	CharacterController cc;
+    CharacterController cc;
     PlayerScriptEC ps;
 
-	public int score = 0;
+    public int score = 0;
     float moveSpeed = 5f;
     public bool canMove = true;
     public LayerMask interactableMask;
@@ -25,21 +26,23 @@ public class PlayerContollerEC : MonoBehaviour {
     bool moveClick;
 
     // Use this for initialization
-    void Start () {
-        if (FindObjectOfType<GameStart>()){
+    void Start()
+    {
+        if (FindObjectOfType<GameStart>())
+        {
             tutorialScript = FindObjectOfType<GameStart>();
         }
         moveClick = false;
-		cc = gameObject.GetComponent<CharacterController> ();
-        ps = gameObject.GetComponent<PlayerScriptEC>();        
-	}
+        cc = gameObject.GetComponent<CharacterController>();
+        ps = gameObject.GetComponent<PlayerScriptEC>();
+    }
 
 
 
     void Update()
     {
         DeathLogic();
-        DialogueLogic();        
+        DialogueLogic();
         MovementLogic();
     }
 
@@ -47,22 +50,25 @@ public class PlayerContollerEC : MonoBehaviour {
     {
         if (ps.inDialogue)
         {
-            if (Input.GetMouseButtonDown(0)){
+            if (Input.GetMouseButtonDown(0))
+            {
                 //ps.SetDialogueValue(false);
                 return;
             }
         }
     }
 
+    private bool CheckPlayerInDialogue()
+    {
+        return PlayerScriptEC.instance.playerState == ePlayerState.inDialogue;
+    }
+
     private void MovementLogic()
     {
-        if (!ps.inDialogue)
-            {
-            if (canMove)
-            {
-                RayCastLogic();
-                DestinationLogic();
-            }
+        if (!CheckPlayerInDialogue())
+        {
+            RayCastLogic();
+            DestinationLogic();
         }
     }
 
