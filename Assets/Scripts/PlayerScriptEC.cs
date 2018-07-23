@@ -93,8 +93,8 @@ public class PlayerScriptEC : MonoBehaviour
     {
         UILogic();
         HealthLogic();
-        DisplayErrorLogic();
-        DialogueLogic();
+        // DisplayErrorLogic();
+        // DialogueLogic();
 
         if (Input.GetKeyDown(KeyCode.A))
         {

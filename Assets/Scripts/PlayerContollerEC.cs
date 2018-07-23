@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerScriptEC))]
 public class PlayerContollerEC : MonoBehaviour
 {
 
@@ -34,7 +35,6 @@ public class PlayerContollerEC : MonoBehaviour
         }
         moveClick = false;
         cc = gameObject.GetComponent<CharacterController>();
-        PlayerScriptEC.instance = gameObject.GetComponent<PlayerScriptEC>();
     }
 
 

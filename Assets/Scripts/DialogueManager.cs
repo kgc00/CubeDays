@@ -12,12 +12,7 @@ public class DialogueManager : MonoBehaviour
     public event Action<sDialogueStruct> continueDialogueEvent = delegate { };
     public event Action endDialogueEvent = delegate { };
     public int currentLineOfDialogue;
-    // {
-    //     get { return currentLineOfDialogue; }
-    //     private set {  }
-
-    // }
-
+    private sDialogueStruct currentDialogueData;
     public static DialogueManager instance;
 
     void Awake()
@@ -41,47 +36,58 @@ public class DialogueManager : MonoBehaviour
     {
         if (CheckPlayerInDialogue())
         {
-            DialogueLogic();
+            // DialogueLogic();
         }
     }
 
+    private void UpdateCurrentDialogueData(sDialogueStruct dialogueData)
+    {
+        currentDialogueData = dialogueData;
+    }
     private bool CheckPlayerInDialogue()
     {
         return PlayerScriptEC.instance.playerState == ePlayerState.inDialogue;
     }
 
-    private void DialogueLogic()
-    {
-
-    }
-
     public void TryStartDialogue(sDialogueStruct sDialogueData)
     {
-        if (initiateDialogueEvent != null)
+        if (PlayerScriptEC.instance.playerState != ePlayerState.inDialogue)
         {
-            initiateDialogueEvent(sDialogueData);
-        }
-        else
-        {
-            Debug.Log("couldnt start dialogue");
+            if (initiateDialogueEvent != null)
+            {                
+                initiateDialogueEvent(sDialogueData);
+            }
+            else
+            {
+                Debug.Log("couldnt start dialogue");
+            }
         }
     }
 
     public void TryEndDialogue()
     {
-        if (endDialogueEvent != null)
+        if (!CheckDialogueLength(currentDialogueData, currentLineOfDialogue))
         {
-            endDialogueEvent();
+            if (endDialogueEvent != null)
+            {
+                endDialogueEvent();
+            }
+            else
+            {
+                Debug.LogError("No end dialogue event");
+            }
         }
         else
         {
-            Debug.LogError("No end dialogue event");
+            continueDialogueEvent(currentDialogueData);
         }
     }
 
     private void DM_StartDialogue(sDialogueStruct sDialogueData)
     {
         currentLineOfDialogue = 0;
+        UpdateCurrentDialogueData(sDialogueData);
+        StopCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));
         StartCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));
     }
 
@@ -100,7 +106,7 @@ public class DialogueManager : MonoBehaviour
 
     private void CheckContinueDialouge(sDialogueStruct dialogueData, int currentLine)
     {
-        if (dialogueData.tTextToDisplay.Length < currentLine)
+        if (CheckDialogueLength(dialogueData, currentLine))
         {
             continueDialogueEvent(dialogueData);
         }
@@ -110,6 +116,11 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    private static bool CheckDialogueLength(sDialogueStruct dialogueData, int currentLine)
+    {
+        return dialogueData.tTextToDisplay.Length > currentLine;
+    }
+
     private void IncreaseDialogueLine()
     {
         currentLineOfDialogue += 1;
@@ -117,38 +128,5 @@ public class DialogueManager : MonoBehaviour
 
     private void DM_EndDialogue()
     {
-        // reset timer (and player state)
-        // enable moevemnt
-    }
-
-    private void EnableTextComponent(eDialogueType inputType)
-    {
-        // npcTextComponent.transform.parent.position = Camera.main.WorldToScreenPoint(transform.position);
-        // npcTextComponent.enabled = true;
-        // dialogueTimer = 0f;
-        // if (inputType == eDialogueType.pickup){              
-        //     SetDialogueValue(true, "pickup", false);
-        //     npcTextComponent.color = Color.green;
-        //     npcTextComponent.text = pickupTextToDisplay;  
-        //     dialogueWaitTime = 3f;               
-        //     pickUpOrNpc = true;    
-        // } else if (inputType == eDialogueType.npc) {
-        //     SetDialogueValue(true, "npc", false);            
-        //     npcTextComponent.text = npcTextToDisplay;
-        //     npcTextComponent.color = Color.blue;
-        //     pickUpOrNpc = true;
-        // } else if (inputType == eDialogueType.goal) {            
-        //     SetDialogueValue(true, "goal");
-        //     npcTextComponent.text = goalCantLeave;
-        //     npcTextComponent.color = goalText.color;
-        //     // replace with a variable
-        //     dialogueWaitTime = 3f;
-        // } else if (inputType == eDialogueType.tutorial){
-        //     npcTextComponent.color = Color.blue;
-        //     npcTextComponent.text = tutorialScript.ReturnCurrentTutorial();
-        //     dialogueWaitTime = tutorialScript.ReturnWaitTime();
-        // } else {
-        //     Debug.LogError("no type specified");
-        // }
     }
 }
