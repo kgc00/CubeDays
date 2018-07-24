@@ -14,6 +14,7 @@ public class DialogueManager : MonoBehaviour
     public int currentLineOfDialogue;
     private sDialogueStruct currentDialogueData;
     public static DialogueManager instance;
+    private IEnumerator CheckContinue;
 
     void Awake()
     {
@@ -54,7 +55,7 @@ public class DialogueManager : MonoBehaviour
         if (PlayerScriptEC.instance.playerState != ePlayerState.inDialogue)
         {
             if (initiateDialogueEvent != null)
-            {                
+            {
                 initiateDialogueEvent(sDialogueData);
             }
             else
@@ -79,6 +80,8 @@ public class DialogueManager : MonoBehaviour
         }
         else
         {
+            print ("try end dialogue was called");
+            StopCoroutine(ContinueDialogueAfterWait(currentDialogueData, CheckContinueDialouge));
             continueDialogueEvent(currentDialogueData);
         }
     }
@@ -87,25 +90,41 @@ public class DialogueManager : MonoBehaviour
     {
         currentLineOfDialogue = 0;
         UpdateCurrentDialogueData(sDialogueData);
-        StopCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));
-        StartCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));
+        if (CheckContinue != null)
+        {
+            StopCoroutine(CheckContinue);
+        }
+        CheckContinue = ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge);
+        StartCoroutine(CheckContinue);
     }
 
     private void DM_ContinueDialogue(sDialogueStruct sDialogueData)
-    {
-        IncreaseDialogueLine();
-        StartCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));
+    {        
+        if (CheckContinue != null)
+        {
+            StopCoroutine(CheckContinue);
+        }
+        StartCoroutine(CheckContinue);
     }
 
     private IEnumerator ContinueDialogueAfterWait(sDialogueStruct sDialogueData, Action<sDialogueStruct, int> onComplete)
     {
-        yield return new WaitForSeconds(sDialogueData.fDialogueWaitTime);
-        onComplete(sDialogueData, currentLineOfDialogue);
-        yield return null;
+        float counter = 0;
+        while (true)
+        {
+            if (counter >= sDialogueData.fDialogueWaitTime)
+            {
+                onComplete(sDialogueData, currentLineOfDialogue);
+                break;
+            }
+            counter += Time.deltaTime;
+            yield return null;
+        }
     }
 
     private void CheckContinueDialouge(sDialogueStruct dialogueData, int currentLine)
     {
+        IncreaseDialogueLine();
         if (CheckDialogueLength(dialogueData, currentLine))
         {
             continueDialogueEvent(dialogueData);
@@ -118,7 +137,9 @@ public class DialogueManager : MonoBehaviour
 
     private static bool CheckDialogueLength(sDialogueStruct dialogueData, int currentLine)
     {
-        return dialogueData.tTextToDisplay.Length > currentLine;
+        // - 1 beacuse we feed currentline directly into our textmanager.
+        // (which matches the int to the index in sDialogueData array of strings)
+        return dialogueData.tTextToDisplay.Length - 1 > currentLine;
     }
 
     private void IncreaseDialogueLine()

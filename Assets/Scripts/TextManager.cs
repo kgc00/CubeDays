@@ -22,7 +22,7 @@ public class TextManager : MonoBehaviour
 
     private void ShowText(sDialogueStruct sDialogueData)
     {        
-        DialogueManager.instance.initiateDialogueEvent -= ShowText;
+        // DialogueManager.instance.initiateDialogueEvent -= ShowText;
         animator.SetTrigger("StartDialogue");
         textParent.SetActive(true);
         SetText(sDialogueData);
@@ -30,6 +30,7 @@ public class TextManager : MonoBehaviour
 
     private void SetText(sDialogueStruct sDialogueData)
     {
+        print("thing");
         textToUse.color = sDialogueData.tTextColor;
         textToUse.text = sDialogueData.tTextToDisplay[GetCurrentLine()];
     }
@@ -41,7 +42,7 @@ public class TextManager : MonoBehaviour
 
     private void AnimateTextOut()
     {
-        DialogueManager.instance.endDialogueEvent -= AnimateTextOut;        
+        // DialogueManager.instance.endDialogueEvent -= AnimateTextOut;        
         // animator.ResetTrigger("ContinueDialogue");
         // animator.ResetTrigger("StartDialogue");
         animator.SetTrigger("EndDialogue");
@@ -50,7 +51,7 @@ public class TextManager : MonoBehaviour
 
     private void ContinueDialogue(sDialogueStruct sDialogueData)
     {
-        DialogueManager.instance.continueDialogueEvent -= ContinueDialogue;
+        // DialogueManager.instance.continueDialogueEvent -= ContinueDialogue;
         animator.SetTrigger("ContinueDialogue");
         SetText(sDialogueData);
     }
