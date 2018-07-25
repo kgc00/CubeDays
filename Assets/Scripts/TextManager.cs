@@ -21,16 +21,30 @@ public class TextManager : MonoBehaviour
     }
 
     private void ShowText(sDialogueStruct sDialogueData)
-    {        
-        // DialogueManager.instance.initiateDialogueEvent -= ShowText;
+    {
         animator.SetTrigger("StartDialogue");
         textParent.SetActive(true);
+    }
+
+    private void ContinueDialogue(sDialogueStruct sDialogueData)
+    {
+        animator.SetTrigger("ContinueDialogue");
         SetText(sDialogueData);
+    }
+
+    private void AnimateTextOut()
+    {
+        animator.SetTrigger("EndDialogue");
+        HideText();
+    }
+
+    private void HideText()
+    {
+        textParent.SetActive(false);
     }
 
     private void SetText(sDialogueStruct sDialogueData)
     {
-        print("thing");
         textToUse.color = sDialogueData.tTextColor;
         textToUse.text = sDialogueData.tTextToDisplay[GetCurrentLine()];
     }
@@ -38,26 +52,5 @@ public class TextManager : MonoBehaviour
     private int GetCurrentLine()
     {
         return DialogueManager.instance.currentLineOfDialogue;
-    }
-
-    private void AnimateTextOut()
-    {
-        // DialogueManager.instance.endDialogueEvent -= AnimateTextOut;        
-        // animator.ResetTrigger("ContinueDialogue");
-        // animator.ResetTrigger("StartDialogue");
-        animator.SetTrigger("EndDialogue");
-        HideText();
-    }
-
-    private void ContinueDialogue(sDialogueStruct sDialogueData)
-    {
-        // DialogueManager.instance.continueDialogueEvent -= ContinueDialogue;
-        animator.SetTrigger("ContinueDialogue");
-        SetText(sDialogueData);
-    }
-
-    private void HideText()
-    {
-        textParent.SetActive(false);
     }
 }

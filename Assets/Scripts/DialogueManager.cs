@@ -15,6 +15,8 @@ public class DialogueManager : MonoBehaviour
     private sDialogueStruct currentDialogueData;
     public static DialogueManager instance;
     private IEnumerator CheckContinue;
+    private Coroutine CoroutineHandler;
+    private bool exitCoroutine = false;
 
     void Awake()
     {
@@ -32,22 +34,9 @@ public class DialogueManager : MonoBehaviour
         endDialogueEvent = DM_EndDialogue;
     }
 
-
-    void Update()
-    {
-        if (CheckPlayerInDialogue())
-        {
-            // DialogueLogic();
-        }
-    }
-
     private void UpdateCurrentDialogueData(sDialogueStruct dialogueData)
     {
         currentDialogueData = dialogueData;
-    }
-    private bool CheckPlayerInDialogue()
-    {
-        return PlayerScriptEC.instance.playerState == ePlayerState.inDialogue;
     }
 
     public void TryStartDialogue(sDialogueStruct sDialogueData)
@@ -65,8 +54,14 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    public void TryExitCoroutine()
+    {
+        exitCoroutine = true;
+    }
+
     public void TryEndDialogue()
     {
+        print("try end dialogue was called: " + !CheckDialogueLength(currentDialogueData, currentLineOfDialogue));
         if (!CheckDialogueLength(currentDialogueData, currentLineOfDialogue))
         {
             if (endDialogueEvent != null)
@@ -80,8 +75,6 @@ public class DialogueManager : MonoBehaviour
         }
         else
         {
-            print ("try end dialogue was called");
-            StopCoroutine(ContinueDialogueAfterWait(currentDialogueData, CheckContinueDialouge));
             continueDialogueEvent(currentDialogueData);
         }
     }
@@ -90,21 +83,19 @@ public class DialogueManager : MonoBehaviour
     {
         currentLineOfDialogue = 0;
         UpdateCurrentDialogueData(sDialogueData);
-        if (CheckContinue != null)
-        {
-            StopCoroutine(CheckContinue);
-        }
         CheckContinue = ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge);
-        StartCoroutine(CheckContinue);
+        continueDialogueEvent(sDialogueData);
     }
 
     private void DM_ContinueDialogue(sDialogueStruct sDialogueData)
-    {        
-        if (CheckContinue != null)
+    {
+        if (CoroutineHandler != null)
         {
-            StopCoroutine(CheckContinue);
+            StopCoroutine(CoroutineHandler);
         }
-        StartCoroutine(CheckContinue);
+        exitCoroutine = false;
+        CoroutineHandler = StartCoroutine(CheckContinue);
+        print("bleh");
     }
 
     private IEnumerator ContinueDialogueAfterWait(sDialogueStruct sDialogueData, Action<sDialogueStruct, int> onComplete)
@@ -112,6 +103,12 @@ public class DialogueManager : MonoBehaviour
         float counter = 0;
         while (true)
         {
+            if (exitCoroutine)
+            {
+                onComplete(sDialogueData, currentLineOfDialogue);
+                break;
+            }
+
             if (counter >= sDialogueData.fDialogueWaitTime)
             {
                 onComplete(sDialogueData, currentLineOfDialogue);
@@ -125,6 +122,7 @@ public class DialogueManager : MonoBehaviour
     private void CheckContinueDialouge(sDialogueStruct dialogueData, int currentLine)
     {
         IncreaseDialogueLine();
+        print("thingo");
         if (CheckDialogueLength(dialogueData, currentLine))
         {
             continueDialogueEvent(dialogueData);
@@ -133,6 +131,10 @@ public class DialogueManager : MonoBehaviour
         {
             TryEndDialogue();
         }
+    }
+
+    private void DM_EndDialogue()
+    {
     }
 
     private static bool CheckDialogueLength(sDialogueStruct dialogueData, int currentLine)
@@ -145,9 +147,5 @@ public class DialogueManager : MonoBehaviour
     private void IncreaseDialogueLine()
     {
         currentLineOfDialogue += 1;
-    }
-
-    private void DM_EndDialogue()
-    {
     }
 }

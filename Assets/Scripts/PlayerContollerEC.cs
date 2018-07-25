@@ -64,6 +64,7 @@ public class PlayerContollerEC : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 DialogueManager.instance.TryEndDialogue();
+                DialogueManager.instance.TryExitCoroutine();
                 return;
             }
         }
