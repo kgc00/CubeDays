@@ -14,7 +14,6 @@ public class DialogueManager : MonoBehaviour
     public int currentLineOfDialogue;
     private sDialogueStruct currentDialogueData;
     public static DialogueManager instance;
-    private IEnumerator CheckContinue;
     private Coroutine CoroutineHandler;
     private bool exitCoroutine = false;
 
@@ -54,14 +53,13 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void TryExitCoroutine()
+    public void SetExitCoroutine()
     {
         exitCoroutine = true;
     }
 
     public void TryEndDialogue()
     {
-        print("try end dialogue was called: " + !CheckDialogueLength(currentDialogueData, currentLineOfDialogue));
         if (!CheckDialogueLength(currentDialogueData, currentLineOfDialogue))
         {
             if (endDialogueEvent != null)
@@ -75,16 +73,15 @@ public class DialogueManager : MonoBehaviour
         }
         else
         {
-            continueDialogueEvent(currentDialogueData);
+            CheckContinueDialouge(currentDialogueData, currentLineOfDialogue);
         }
     }
 
     private void DM_StartDialogue(sDialogueStruct sDialogueData)
-    {
+    {       
         currentLineOfDialogue = 0;
         UpdateCurrentDialogueData(sDialogueData);
-        CheckContinue = ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge);
-        continueDialogueEvent(sDialogueData);
+        continueDialogueEvent(sDialogueData);        
     }
 
     private void DM_ContinueDialogue(sDialogueStruct sDialogueData)
@@ -94,8 +91,7 @@ public class DialogueManager : MonoBehaviour
             StopCoroutine(CoroutineHandler);
         }
         exitCoroutine = false;
-        CoroutineHandler = StartCoroutine(CheckContinue);
-        print("bleh");
+        CoroutineHandler = StartCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));        
     }
 
     private IEnumerator ContinueDialogueAfterWait(sDialogueStruct sDialogueData, Action<sDialogueStruct, int> onComplete)
@@ -121,8 +117,7 @@ public class DialogueManager : MonoBehaviour
 
     private void CheckContinueDialouge(sDialogueStruct dialogueData, int currentLine)
     {
-        IncreaseDialogueLine();
-        print("thingo");
+        IncreaseDialogueLine();        
         if (CheckDialogueLength(dialogueData, currentLine))
         {
             continueDialogueEvent(dialogueData);
