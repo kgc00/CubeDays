@@ -20,24 +20,12 @@ public class PlayerScriptEC : MonoBehaviour
     public int scoreValue;
     public Image endIMG;
     public Image deadIMG;
-    public Text npcTextComponent;
-    public NPCScript myNPC;
     public Text goalText;
     public string goalCantLeave;
     public string pickupText;
     public bool hasKey = false;
-    bool end = false;
-    float timer;
-    float dialogueTimer;
-    public float dialogueWaitTime = 5f;
-    float msgWaitTime = 1.5f;
-    public string npcDialogueText;
     EndCubeScript endCube;
     PlayerContollerEC playCont;
-    public bool inDialogue { get; private set; }
-    bool pickUpOrNpc;
-    GameStart tutorialScript;
-    string dialogueType;
     public ePlayerState playerState;
     public static PlayerScriptEC instance;
 
@@ -53,12 +41,7 @@ public class PlayerScriptEC : MonoBehaviour
             Destroy(this);
         }
 
-        pickUpOrNpc = false;
         lives = 3;
-        if (FindObjectOfType<GameStart>())
-        {
-            tutorialScript = FindObjectOfType<GameStart>();
-        }
         endCube = FindObjectOfType<EndCubeScript>();
         playCont = GetComponent<PlayerContollerEC>();
         endIMG.enabled = false;
@@ -83,9 +66,9 @@ public class PlayerScriptEC : MonoBehaviour
         playerState = ePlayerState.idle;
     }
 
-    public void PassPlayerState()
+    public ePlayerState PassPlayerState()
     {
-
+        return playerState;
     }
 
     // Update is called once per frame
@@ -102,76 +85,6 @@ public class PlayerScriptEC : MonoBehaviour
         }
     }
 
-    private void DialogueLogic()
-    {
-        //Timer for NPC Dialogue 
-        if (npcTextComponent.enabled)
-        {
-            dialogueTimer = dialogueTimer + Time.deltaTime;
-            if (dialogueTimer > dialogueWaitTime)
-            {
-                if (pickUpOrNpc)
-                {
-                    //SetDialogueValue(false);
-                    pickUpOrNpc = false;
-                }
-                else if (dialogueType == "tutorial")
-                {
-                    if (tutorialScript.ReturnCurrentTutorialIndex() > 2)
-                    {
-                        //SetDialogueValue(false);
-                    }
-                }
-            }
-        }
-
-        if (!npcTextComponent.enabled)
-        {
-            if (dialogueTimer >= dialogueWaitTime && inDialogue)
-            {
-                //SetDialogueValue(false);
-            }
-        }
-        else
-        {
-            return;
-        }
-    }
-
-    public void TutorialHack()
-    {
-        StartCoroutine(EnableMovementCoroutine());
-    }
-
-    IEnumerator EnableMovementCoroutine()
-    {
-        float crWaitTime = .25f;
-        if (dialogueType == "tutorial")
-        {
-            if (tutorialScript.ReturnCurrentTutorialIndex() < 2)
-            {
-                yield break;
-            }
-            else if (tutorialScript.ReturnCurrentTutorialIndex() >= 2)
-            {
-                yield return new WaitForSeconds(crWaitTime);
-                // playCont.canMove = true;
-            }
-        }
-        else
-        {
-            yield return new WaitForSeconds(crWaitTime);
-            // playCont.canMove = true;
-        }
-    }
-
-    public void Interact(float waitTime, string text)
-    {
-        dialogueWaitTime = waitTime;
-        npcDialogueText = text;
-        //EnableTextComponent("npc");
-    }
-
     public void Pickup()
     {
         //EnableTextComponent("pickup");
@@ -180,20 +93,6 @@ public class PlayerScriptEC : MonoBehaviour
     public void noKeyCantLeave()
     {
         //EnableTextComponent("goal");
-    }
-
-    // Timer for Cant Reach
-    private void DisplayErrorLogic()
-    {
-        if (click.enabled)
-        {
-            timer = timer + Time.deltaTime;
-            if (timer >= msgWaitTime)
-            {
-                click.enabled = false;
-                timer = 0f;
-            }
-        }
     }
 
     private void HealthLogic()
@@ -224,19 +123,7 @@ public class PlayerScriptEC : MonoBehaviour
         GameObject hurt = Instantiate(hurtfx, transform.position, transform.rotation);
     }
 
-    public void CantReach()
-    {
-        click.text = "Can't Reach";
-        click.enabled = true;
-        click.transform.position = Camera.main.WorldToScreenPoint(transform.position);
-    }
 
-    public void NotFloor()
-    {
-        click.text = "That's A NotFloor.";
-        click.enabled = true;
-        click.transform.position = Camera.main.WorldToScreenPoint(transform.position);
-    }
 
     public void End()
     {

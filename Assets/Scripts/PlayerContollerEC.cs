@@ -25,18 +25,29 @@ public class PlayerContollerEC : MonoBehaviour
     public GameObject myPlay;
     GameStart tutorialScript;
     bool moveClick;
+    public event Action<eFloorType> targetInvalid;
+    public static PlayerContollerEC instance;
 
     // Use this for initialization
     void Start()
     {
-        if (FindObjectOfType<GameStart>())
+        if (instance == null)
         {
-            tutorialScript = FindObjectOfType<GameStart>();
+            instance = this;
         }
+        else if (instance != this)
+        {
+            Destroy(this);
+        }
+        
         moveClick = false;
         cc = gameObject.GetComponent<CharacterController>();
+        targetInvalid = InvalidTargetClicked;
     }
 
+    private void InvalidTargetClicked(eFloorType _floorType){
+        // stuff
+    }
 
 
     void Update()
@@ -92,8 +103,7 @@ public class PlayerContollerEC : MonoBehaviour
 
             if (hit.point.y - transform.position.y > .6f || hit.point.y - transform.position.y < -2f)
             {
-                //Debug.Log("Click");
-                PlayerScriptEC.instance.CantReach();
+                targetInvalid(eFloorType.floor);
             }
             else if (hitSomething)
             {
@@ -108,7 +118,7 @@ public class PlayerContollerEC : MonoBehaviour
             }
             else if (hitSomethingNF)
             {
-                PlayerScriptEC.instance.NotFloor();
+                targetInvalid(eFloorType.notFloor);
             }
         }
     }

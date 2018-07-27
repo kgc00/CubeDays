@@ -40,15 +40,18 @@ public class DialogueManager : MonoBehaviour
 
     public void TryStartDialogue(sDialogueStruct sDialogueData)
     {
-        if (PlayerScriptEC.instance.playerState != ePlayerState.inDialogue)
+        if (sDialogueData.tTextToDisplay.Length > 0)
         {
-            if (initiateDialogueEvent != null)
+            if (PlayerScriptEC.instance.playerState != ePlayerState.inDialogue)
             {
-                initiateDialogueEvent(sDialogueData);
-            }
-            else
-            {
-                Debug.Log("couldnt start dialogue");
+                if (initiateDialogueEvent != null)
+                {
+                    initiateDialogueEvent(sDialogueData);
+                }
+                else
+                {
+                    Debug.LogError("couldnt start dialogue");
+                }
             }
         }
     }
@@ -78,10 +81,10 @@ public class DialogueManager : MonoBehaviour
     }
 
     private void DM_StartDialogue(sDialogueStruct sDialogueData)
-    {       
+    {
         currentLineOfDialogue = 0;
         UpdateCurrentDialogueData(sDialogueData);
-        continueDialogueEvent(sDialogueData);        
+        continueDialogueEvent(sDialogueData);
     }
 
     private void DM_ContinueDialogue(sDialogueStruct sDialogueData)
@@ -91,7 +94,7 @@ public class DialogueManager : MonoBehaviour
             StopCoroutine(CoroutineHandler);
         }
         exitCoroutine = false;
-        CoroutineHandler = StartCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));        
+        CoroutineHandler = StartCoroutine(ContinueDialogueAfterWait(sDialogueData, CheckContinueDialouge));
     }
 
     private IEnumerator ContinueDialogueAfterWait(sDialogueStruct sDialogueData, Action<sDialogueStruct, int> onComplete)
@@ -117,7 +120,7 @@ public class DialogueManager : MonoBehaviour
 
     private void CheckContinueDialouge(sDialogueStruct dialogueData, int currentLine)
     {
-        IncreaseDialogueLine();        
+        IncreaseDialogueLine();
         if (CheckDialogueLength(dialogueData, currentLine))
         {
             continueDialogueEvent(dialogueData);

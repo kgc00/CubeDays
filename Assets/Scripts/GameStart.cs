@@ -48,7 +48,7 @@ public class GameStart : MonoBehaviour {
 			timerOn = false;
 			displayText.enabled = false;
 			//ps.SetDialogueValue(false, "tutorial", false);
-			ps.TutorialHack();
+			// ps.TutorialHack();
 		}
 	}
 

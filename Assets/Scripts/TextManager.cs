@@ -45,7 +45,7 @@ public class TextManager : MonoBehaviour
 
     private void SetText(sDialogueStruct sDialogueData)
     {
-        textToUse.color = sDialogueData.tTextColor;
+        textToUse.color = new Color (sDialogueData.tTextColor.r, sDialogueData.tTextColor.g, sDialogueData.tTextColor.b);
         textToUse.text = sDialogueData.tTextToDisplay[GetCurrentLine()];
     }
 
