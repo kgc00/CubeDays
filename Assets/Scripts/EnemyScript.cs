@@ -1,82 +1,52 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class EnemyScript : MonoBehaviour {
-
-	public float movementSpeed = .05f;
-    PlayerScriptEC ps;
+public class EnemyScript : PooledMonobehaviour
+{
+    public event Action dealDamage;
+    public float movementSpeed = .05f;
     float maxHitRecoveryTime = 2f;
     float cooldownTimer;
     bool hasHit = false;
-    float timer;
-    public float life;
-    public bool forward = true;
-    public bool right = false;
-    public bool back = false;
-    public bool left = false;
+    [SerializeField]
+    private float lifespan = 4.0f;
 
-    // Use this for initialization
-    void Start () {
-        cooldownTimer = maxHitRecoveryTime;
-        ps = FindObjectOfType<PlayerScriptEC>();
-
-        Renderer rend = gameObject.GetComponent<Renderer>();
-        rend.material.color = new Color(Random.value, Random.value, Random.value);
-    }
-	
-	// Update is called once per frame
-	void Update ()
+    void Awake()
     {
-        if (forward)
-        {
-            transform.position = transform.position + Vector3.forward * movementSpeed;
-        } else if (right)
-        {
-            transform.position = transform.position + Vector3.right * movementSpeed;            
-            transform.rotation = Quaternion.Euler(0, 0, 90);
-        } else if (back)
-        {
-            transform.position = transform.position + Vector3.back * movementSpeed;
-        } else if (left)
-        {
-            transform.position = transform.position + Vector3.left * movementSpeed;
-            transform.rotation = Quaternion.Euler(0, 0, 90);
-        }
-
-
-        timer = timer + Time.deltaTime;
-        if (timer >= life)
-        {
-            Destroy(gameObject.transform.parent.gameObject);
-            timer = 0f;
-        }
-
-        //if (hasHit)
-        //{
-        //    cooldownTimer = cooldownTimer - Time.deltaTime;
-
-        //    if (cooldownTimer <= 0)
-        //    {
-        //        cooldownTimer = maxHitRecoveryTime;
-        //        hasHit = false;
-        //    }
-        //}
+        cooldownTimer = maxHitRecoveryTime;
+        Renderer rend = gameObject.GetComponentInChildren<Renderer>();
+        rend.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+        dealDamage = DealDamage;
     }
 
-    //public void Test()
-    //{
-    //    Debug.Log("Worked");
-    //}
+    private void OnEnable(){
+        StartCoroutine(DisableSelf());
+    }
+
+    private IEnumerator DisableSelf(){
+        yield return new WaitForSeconds(lifespan);
+        base.OnDisable();
+        gameObject.SetActive(false);
+    }
+
+    void Update()
+    {
+        transform.position = transform.position + transform.forward * movementSpeed;
+    }
 
     void OnTriggerEnter(Collider other)
     {
-        //Debug.Log("1");
-        if (other.tag == "Player")// && !hasHit)
+        if (other.tag == "Player")
         {
-           // Debug.Log("2");
-            ps.hurt();
+            dealDamage();
             hasHit = true;
         }
-    }    
+    }
+
+    private void DealDamage()
+    {
+        // stuff
+    }
 }

@@ -1,32 +1,41 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class PickupScript : MonoBehaviour {
-
-    PlayerScriptEC myPlay;
-
-    // Use this for initialization
-    void Start () {
-		Renderer rend = gameObject.GetComponent<Renderer> ();
-		rend.material.color = new Color (Random.value, Random.value, Random.value);
-        myPlay = FindObjectOfType<PlayerScriptEC>();
-
+public class PickupScript : MonoBehaviour
+{
+    Renderer rend;
+    public event Action startCollection;
+    public static PickupScript instance;
+    [SerializeField]
+    private Color transparent;
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(this);
+        }
+        rend = gameObject.GetComponent<Renderer>();
+        rend.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+        startCollection = Collect;
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player")
         {
-            myPlay.hasKey = true;
-            myPlay.inventoryString = myPlay.inventoryString + "KeySphere";
-            myPlay.Pickup();
-            Destroy(gameObject);
+            startCollection();
         }
+    }
+
+    private void Collect()
+    {
+        rend.material.color = transparent;
+        Destroy(gameObject, 3f);
     }
 }

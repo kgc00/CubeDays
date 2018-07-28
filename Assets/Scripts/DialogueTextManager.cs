@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TextManager : MonoBehaviour
+[RequireComponent(typeof(DialogueManager))]
+public class DialogueTextManager : MonoBehaviour
 {
     [SerializeField]
     Text textToUse;

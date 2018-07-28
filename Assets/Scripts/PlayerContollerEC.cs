@@ -29,7 +29,7 @@ public class PlayerContollerEC : MonoBehaviour
     public static PlayerContollerEC instance;
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
         if (instance == null)
         {
@@ -39,21 +39,24 @@ public class PlayerContollerEC : MonoBehaviour
         {
             Destroy(this);
         }
-        
+
         moveClick = false;
         cc = gameObject.GetComponent<CharacterController>();
         targetInvalid = InvalidTargetClicked;
     }
 
-    private void InvalidTargetClicked(eFloorType _floorType){
+    private void InvalidTargetClicked(eFloorType _floorType)
+    {
         // stuff
     }
 
 
     void Update()
     {
-        DeathLogic();
-        DetermineLogic();
+        if (CheckAlive())
+        {
+            DetermineLogic();
+        }
     }
 
     private void DetermineLogic()
@@ -142,11 +145,8 @@ public class PlayerContollerEC : MonoBehaviour
         }
     }
 
-    private void DeathLogic()
+    private bool CheckAlive()
     {
-        if (PlayerScriptEC.instance.isDead)
-        {
-            canMove = false;
-        }
+        return PlayerScriptEC.instance.playerState != ePlayerState.dead;
     }
 }

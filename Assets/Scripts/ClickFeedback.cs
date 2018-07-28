@@ -13,23 +13,30 @@ public class ClickFeedback : MonoBehaviour
 	[SerializeField]
     private Text textToUse;
     Coroutine coroutineHandler;
+    private float timeToWait = 1.5f;
+    [SerializeField]
+    private Transform target;
 
     // Use this for initialization
     void Start()
     {
-        PlayerContollerEC.instance.targetInvalid += DetermineErrorType;
+        textToUse.enabled = false;
+        PlayerContollerEC.instance.targetInvalid += DetermineErrorType;     
     }
 
     private IEnumerator DisplayErrorLogic(string messageToDisplay)
     {
-        textToUse.transform.position = Camera.main.WorldToScreenPoint(transform.position);
+        textToUse.transform.position = Camera.main.WorldToScreenPoint(target.position);
         textToUse.enabled = true;
 		textToUse.text = messageToDisplay;
 		textToUse.color = Color.red;
-		
-		// need to add support for additional animation logic/states
-
+        yield return new WaitForSeconds(timeToWait);
+		ClearFeedback();
 		yield return null;
+    }
+
+    private void ClearFeedback(){
+         textToUse.enabled = false;
     }
 
     private void DetermineErrorType(eFloorType _floorType)

@@ -10,5 +10,6 @@ public class TutorialTrigger : DialogueObject
         {
             InitiateDialogue(sDialogueData);
         }
+        Destroy(this, 2.0f);
     }
 }

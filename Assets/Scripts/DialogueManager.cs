@@ -42,7 +42,7 @@ public class DialogueManager : MonoBehaviour
     {
         if (sDialogueData.tTextToDisplay.Length > 0)
         {
-            if (PlayerScriptEC.instance.playerState != ePlayerState.inDialogue)
+            if (PlayerScriptEC.instance.playerState == ePlayerState.idle)
             {
                 if (initiateDialogueEvent != null)
                 {
