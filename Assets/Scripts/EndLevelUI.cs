@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,9 +16,13 @@ public class EndLevelUI : MonoBehaviour
     [SerializeField]
     private Color textColor;
     [SerializeField]
+    private Color alertColor;
+    [SerializeField]
     private Transform target;
+    private float timeToWait = 3.0f;
 
-    void Start()
+
+    void Awake()
     {
         textToUse.enabled = false;
         EndCubeScript.instance.endLevelFeedback += DisplayEndingText;
@@ -51,17 +56,24 @@ public class EndLevelUI : MonoBehaviour
     }
 
     private void DisplayAlertText()
-    {
+    {        
         try
         {
             textToUse.transform.position = Camera.main.WorldToScreenPoint(target.position);
             textToUse.enabled = true;
-            textToUse.text = messageToDisplay;
-            textToUse.color = textColor;
+            textToUse.text = alertText;
+            textToUse.color = alertColor;
+            StartCoroutine(HideText());
         }
         catch
         {
             Debug.LogError("text target transform was never set.");
         }
+    }
+
+    private IEnumerator HideText()
+    {
+        yield return new WaitForSeconds(timeToWait);
+        textToUse.enabled = false;
     }
 }

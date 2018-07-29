@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
-[RequireComponent(typeof(PlayerHealth))]
+[RequireComponent(typeof(PlayerScriptEC))]
 public class PlayerInventory : MonoBehaviour
 {
     public bool hasKey { get; private set; }
@@ -29,7 +30,7 @@ public class PlayerInventory : MonoBehaviour
     private void UpdateInventory()
     {
         PickupScript.instance.startCollection -= UpdateInventory;
-        hasKey = true;        
+        hasKey = true;
     }
 
     private bool ReturnInventory()

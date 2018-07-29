@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,30 +7,43 @@ using UnityEngine.UI;
 [RequireComponent(typeof(PlayerHealth))]
 public class PlayerUI : MonoBehaviour
 {
-    public Text healthText;
-    public Text livesText;
-    public string inventoryString;
-    public Text inventoryText;
-    public Text scoreText;
-    public int scoreValue;
-    public Image endIMG;
-    public Image deadIMG;
-    public Text goalText;
+    [SerializeField]
+    private Text healthText;
+    [SerializeField]
+    private Text livesText;
+    [SerializeField]
+    private Text inventoryText;
+    [SerializeField]
+    private Text scoreText;
+    [SerializeField]
+    private string currentItem;
+    private int scoreValue;
     private PlayerHealth healthComponent;
     // Use this for initialization
-    void Start()
+    void Awake()
     {
-        endIMG.enabled = false;
-        deadIMG.enabled = false;
-        goalText.enabled = false;
         healthComponent = GetComponent<PlayerHealth>();
+
+    }
+
+    void Start (){
+        SetValues();
+    }
+
+    private void SetValues()
+    {
+        UILogic();
+        PickupScript.instance.startCollection += GrabbedItem;
     }
 
     private void UILogic()
     {
         healthText.text = healthComponent.health.ToString();
         livesText.text = healthComponent.lives.ToString();
-        inventoryText.text = inventoryString;
         scoreText.text = scoreValue.ToString();
+    }
+
+    private void GrabbedItem(){
+        inventoryText.text = currentItem;
     }
 }

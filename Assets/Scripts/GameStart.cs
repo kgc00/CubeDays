@@ -35,7 +35,7 @@ public class GameStart : MonoBehaviour {
 		tutTextArray [4] = "This is the keysphere, you'll use it to unlock the exit...";
 		tutTextArray [5] = "You can fly!  Try clicking on the ground above you...";
 		tutTextArray [6] = "This big cube is the exit!  Get to it!";
-		pc.canMove = false;
+		// pc.canMove = false;
 		ps = FindObjectOfType<PlayerScriptEC>();
 	}
 

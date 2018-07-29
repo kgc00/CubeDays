@@ -8,23 +8,12 @@ public class PlayerContollerEC : MonoBehaviour
 {
 
     CharacterController cc;
-
-    public int score = 0;
     float moveSpeed = 5f;
-    public bool canMove = true;
-    public LayerMask interactableMask;
-    public LayerMask npcMask;
     public LayerMask geometryMask;
     public LayerMask notFloorMask;
-
     Vector3 destination;
     bool hasADestination = false;
-    bool hitSomethingNF;
-
     public GameObject destinationSparkle;
-    public GameObject myPlay;
-    GameStart tutorialScript;
-    bool moveClick;
     public event Action<eFloorType> targetInvalid;
     public static PlayerContollerEC instance;
 
@@ -39,8 +28,7 @@ public class PlayerContollerEC : MonoBehaviour
         {
             Destroy(this);
         }
-
-        moveClick = false;
+        
         cc = gameObject.GetComponent<CharacterController>();
         targetInvalid = InvalidTargetClicked;
     }
@@ -102,7 +90,7 @@ public class PlayerContollerEC : MonoBehaviour
             RaycastHit hit;
             RaycastHit hitnotFloor;
             bool hitSomething = Physics.Raycast(ray, out hit, 1000, geometryMask);
-            hitSomethingNF = Physics.Raycast(ray, out hitnotFloor, 1000, notFloorMask);
+            bool hitSomethingNF = Physics.Raycast(ray, out hitnotFloor, 1000, notFloorMask);
 
             if (hit.point.y - transform.position.y > .6f || hit.point.y - transform.position.y < -2f)
             {
